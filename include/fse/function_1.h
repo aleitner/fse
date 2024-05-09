@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define FUNCTION_1_SIZE 4 // Since we know the function size is 4 bytes
+#define FUNCTION_1_SIZE 4
 
 #pragma pack(push, 1)
 typedef struct {
-    uint8_t data[FUNCTION_1_SIZE]; // Placeholder for "Unknown" data. Use appropriate type if known.
+    uint8_t data[FUNCTION_1_SIZE];
 } function_1_t;
 #pragma pack(pop)
 

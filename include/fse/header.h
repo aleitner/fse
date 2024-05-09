@@ -1,5 +1,5 @@
-#ifndef SAVE_DAT_HEADER_H
-#define SAVE_DAT_HEADER_H
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <stdint.h>
 #include <stdio.h>
