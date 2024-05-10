@@ -33,10 +33,10 @@ typedef struct {
     char current_map_filename[SIZE_MAP_FILENAME];       // Current map filename, e.g. "ARTEMPLE.sav"
     uint8_t save_screen_bmp[SIZE_BMP_IMAGE];            // Raw BMP image data
     uint8_t unused_zeroes[SIZE_UNUSED_ZEROES];          // Unused section, filled with zeroes
-} save_dat_header_t;
+} header_t;
 #pragma pack(pop)
 
-void read_header(FILE *file, save_dat_header_t *header);
-void print_header(const save_dat_header_t *header);
+header_t* load_header(FILE *file);
+void print_header(const header_t *header);
 
 #endif

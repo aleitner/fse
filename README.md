@@ -1,4 +1,4 @@
-# Fallout Savegame Editor (FSE)
+# Fallout Save Editor (FSE)
 
 This project provides a tool for reading and potentially editing the contents of savegame files for the classic game Fallout. This tool gives you the capability to view and modify various aspects of save files, including player stats, inventory, and game world state.
 

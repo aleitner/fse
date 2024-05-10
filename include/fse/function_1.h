@@ -1,5 +1,5 @@
-#ifndef SAVE_DAT_FUNCTION_1_H
-#define SAVE_DAT_FUNCTION_1_H
+#ifndef FUNCTION_1_H
+#define FUNCTION_1_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -12,7 +12,6 @@ typedef struct {
 } function_1_t;
 #pragma pack(pop)
 
-function_1_t read_function_1(FILE *file, uint32_t offset);
-void write_function_1(FILE *file, uint32_t offset, function_1_t func1);
+function_1_t* load_function_1(FILE *file, uint32_t offset);
 
 #endif
