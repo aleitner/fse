@@ -38,26 +38,52 @@ uint32_t find_function_5_offset(FILE *file) {
     return 0;
 }
 
+
 function_5_t* load_function_5(FILE *file, uint32_t offset) {
+    // Seek to the start of function 5 data within the file
     fseek(file, offset, SEEK_SET);
 
-    // Read the fixed portion of function_5_t structure
+    // Read the fixed portion of the function_5_t structure
     size_t fixed_part_size = offsetof(function_5_t, inventory);
     function_5_t fixed_part;
-    fread(&fixed_part, fixed_part_size, 1, file);
+    if (fread(&fixed_part, fixed_part_size, 1, file) != 1) {
+        fprintf(stderr, "Failed to read the fixed part of function 5.\n");
+        return NULL;
+    }
 
-    // Allocate memory for function_5_t structure including inventory based on item count
-    size_t total_size = fixed_part_size + ntohl(fixed_part.items_in_inventory) * sizeof(item_t);
-    function_5_t *function_5 = (function_5_t *)malloc(total_size);
+    uint32_t items_in_inventory = ntohl(fixed_part.items_in_inventory);
+
+    // Allocate memory for the inventory items (pointers to items)
+    size_t function_5_size = sizeof(function_5_t) + sizeof(item_t) * items_in_inventory;
+    function_5_t *function_5 = (function_5_t *)malloc(function_5_size);
     if (!function_5) {
+        fprintf(stderr, "Failed to allocate memory for function_5_t structure.\n");
         return NULL;
     }
 
     // Copy the fixed part into the newly allocated structure
     memcpy(function_5, &fixed_part, fixed_part_size);
 
-    // Read the inventory items into function_5->inventory
-    fread(function_5->inventory, sizeof(item_t), ntohl(fixed_part.items_in_inventory), file);
+    // Calculate the starting offset for the inventory items
+    uint32_t current_item_offset = offset + fixed_part_size;
+
+    for (uint32_t i = 0; i < items_in_inventory; ++i) {
+        // Read the item from the file at the current offset
+        item_t *item = read_item(file, current_item_offset);
+        if (item == NULL) {
+            free(function_5);
+            return NULL;
+        }
+
+        // Store the read item in the inventory array
+        function_5->inventory[i] = *item;
+
+        // Free the temporary item now that it's been copied to the inventory
+        free_item(item);
+
+        // Update the offset for the next item. Note that the size of the read item can vary.
+        current_item_offset += get_item_size(&function_5->inventory[i]);
+    }
 
     return function_5;
 }
@@ -85,10 +111,23 @@ void print_function_5(const function_5_t *func5) {
     printf("Facing: %s\n", facing_to_string(ntohl(func5->facing)));
     printf("FID (Appearance): 0x%.8hx\n", ntohl(func5->FID));
     printf("Unknown Special: 0x%.8hx\n", ntohl(func5->unknown_special));
-    printf("Map Level: %u\n", ntohl(func5->map_level));
-    printf("Items in Inventory: %u\n", ntohl(func5->items_in_inventory));
-    printf("Crippled Body Parts: %u\n", ntohl(func5->crippled_body_parts));
-    printf("Hitpoints: %u\n", ntohl(func5->hitpoints));
-    printf("Radiation Level: %u\n", ntohl(func5->radiation_level));
-    printf("Poison Level: %u\n", ntohl(func5->poison_level));
+    printf("Map Level: %d\n", ntohl(func5->map_level));
+    printf("Items in Inventory: %d\n", ntohl(func5->items_in_inventory));
+    printf("Crippled Body Parts: %d\n", ntohl(func5->crippled_body_parts));
+    printf("Hitpoints: %d\n", ntohl(func5->hitpoints));
+    printf("Radiation Level: %d\n", ntohl(func5->radiation_level));
+    printf("Poison Level: %d\n", ntohl(func5->poison_level));
+
+    // Iterate over the inventory items and call print_item for each one
+    for (uint32_t i = 0; i < ntohl(func5->items_in_inventory); ++i) {
+        print_item(&func5->inventory[i]);
+    }
+
+}
+
+void free_function_5(function_5_t *func5) {
+    if (func5 == NULL)
+        return;
+
+    free(func5);
 }

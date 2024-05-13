@@ -40,6 +40,7 @@ uint32_t find_function_5_offset(FILE *file);
 function_5_t* load_function_5(FILE *file, uint32_t offset);
 void print_function_5(const function_5_t *func5);
 const char* facing_to_string(uint32_t facing);
+void free_function_5(function_5_t *func5);
 
 #endif
 
