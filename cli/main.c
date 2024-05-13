@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     function_1_t *function_1 = NULL;
     function_5_t *function_5 = NULL;
     uint32_t function_5_offset = 0;
-    int return_code = EXIT_SUCCESS;  // Default return code is success
+    int return_code = EXIT_SUCCESS;
 
     saveFile = fopen(filename, "rb");
     if (!saveFile) {

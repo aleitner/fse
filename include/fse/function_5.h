@@ -35,7 +35,6 @@ typedef struct {
 } function_5_t;
 #pragma pack(pop)
 
-// Function to find the offset of function 5 in the SAVE.DAT file
 uint32_t find_function_5_offset(FILE *file);
 function_5_t* load_function_5(FILE *file, uint32_t offset);
 void print_function_5(const function_5_t *func5);

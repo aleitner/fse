@@ -5,29 +5,65 @@
     #include <stdlib.h>
     #include <string.h>
 
-    size_t get_item_size(const item_t* item) {
-        return offsetof(item_t, ammo_type) + (is_gun_type(item->object_id) ? sizeof(uint32_t) : 0);
+    item_category_t get_item_category(uint32_t object_id) {
+        size_t i;
+
+        for (i = 0; i < sizeof(WEAPONS)/sizeof(WEAPONS[0]); i++) {
+            if (WEAPONS[i].id == ntohl(object_id))
+                return ITEM_WEAPON;
+        }
+
+        for (i = 0; i < sizeof(AMMO)/sizeof(AMMO[0]); i++) {
+            if (AMMO[i].id == ntohl(object_id))
+                return ITEM_AMMO;
+        }
+
+        for (i = 0; i < sizeof(ARMOR)/sizeof(ARMOR[0]); i++) {
+            if (ARMOR[i].id == ntohl(object_id))
+                return ITEM_ARMOR;
+        }
+
+        for (i = 0; i < sizeof(DRUGS)/sizeof(DRUGS[0]); i++) {
+            if (DRUGS[i].id == ntohl(object_id))
+                return ITEM_DRUG;
+        }
+
+        for (i = 0; i < sizeof(MISC)/sizeof(MISC[0]); i++) {
+            if (MISC[i].id == ntohl(object_id))
+                return ITEM_MISC;
+        }
+
+        return ITEM_UNKNOWN;
     }
 
-    int is_gun_type(uint32_t object_id) {
-        return 0;
+
+    size_t get_item_size(const item_t* item) {
+        if (!item) return 0;
+
+        size_t size = offsetof(item_t, multiple_uses);
+
+        item_category_t category = get_item_category(item->object_id);
+        if (category == ITEM_WEAPON || category == ITEM_AMMO || category == ITEM_MISC)
+            size += sizeof(item->multiple_uses);
+
+        if (category == ITEM_WEAPON)
+            size += sizeof(item->ammo_type);
+
+        return size;
     }
 
     item_t* read_item(FILE* file, uint32_t offset) {
-        // Seek to the specified offset in the file before reading the item
         if (fseek(file, offset, SEEK_SET) != 0) {
             fprintf(stderr, "Seeking to offset %u failed.\n", offset);
             return NULL;
         }
 
-        // Allocate memory for the entire item structure
         item_t* item = malloc(sizeof(item_t));
         if (item == NULL) {
             fprintf(stderr, "Memory allocation failed.\n");
             return NULL;
         }
 
-        // Read the known part of the item structure, up to (but not including) the ammo_type
         size_t fixed_part_size = offsetof(item_t, ammo_type);
         if (fread(item, fixed_part_size, 1, file) != 1) {
             fprintf(stderr, "Failed to read fixed part of the item at offset %u.\n", offset);
@@ -35,21 +71,29 @@
             return NULL;
         }
 
-        // Determine if this item is a gun and thus has an ammo_type
-        int has_ammo_type = is_gun_type(item->object_id);
-        if (has_ammo_type) {
-            // Read the additional uint32_t for the ammo_type
-            if (fread(&item->ammo_type, sizeof(uint32_t), 1, file) != 1) {
-                fprintf(stderr, "Failed to read ammo_type for the item at offset %u.\n", offset);
+        item_category_t category = get_item_category(item->object_id);
+        if (category == ITEM_WEAPON || category == ITEM_AMMO || category == ITEM_MISC) {
+            if (fread(&item->multiple_uses, sizeof(uint32_t), 1, file) != 1) {
+                fprintf(stderr, "Failed to read multiple_uses for the item.\n");
                 free(item);
                 return NULL;
             }
-        } 
-        
-        else {
-            // If not a gun type, set ammo_type to a default value, such as 0
-            item->ammo_type = 0;
         }
+
+        else
+            item->multiple_uses = 0;
+
+        if (category == ITEM_WEAPON) {
+            if (fread(&item->ammo_type, sizeof(uint32_t), 1, file) != 1) {
+                fprintf(stderr, "Failed to read ammo_type for the item.\n");
+                free(item);
+                return NULL;
+            }
+        }
+
+        
+        else
+            item->ammo_type = 0;
 
         return item;
     }
@@ -63,6 +107,9 @@
             printf("Item data is NULL.\n");
             return;
         }
+
+        size_t size = get_item_size(item);
+        printf("Object ID (%ld): %d\n", size, ntohl(item->object_id));
 
         printf("Quantity: %d\n", ntohl(item->quantity));
         printf("Unknown Field (0): 0x%.8hx\n", ntohl(item->unknown_field_1));
@@ -89,7 +136,5 @@
         printf("Unknown Container Field: 0x%.8hx\n", ntohl(item->unknown_field_15));
         printf("Unknown Field (0): %d\n", ntohl(item->unknown_field_16));
         printf("Multiple use: 0x%.8hx\n", ntohl(item->multiple_uses));
-
-        if (is_gun_type(item->object_id))
-            printf("Ammo type: %d\n", ntohl(item->ammo_type));
+        printf("Ammo Type: 0x%.8hx\n", ntohl(item->ammo_type));
     }
