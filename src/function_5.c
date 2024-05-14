@@ -95,8 +95,8 @@ void print_function_5(const function_5_t *func5) {
     printf("Signature: 0x%.8hx\n", ntohl(func5->signature));
     printf("Coordinates: 0x%.8hx\n", ntohs(func5->coordinates));
     printf("Facing: %s\n", facing_to_string(ntohl(func5->facing)));
-    printf("FID (Appearance): 0x%.8hx\n", ntohl(func5->FID));
-    printf("Unknown Special: 0x%.8hx\n", ntohl(func5->unknown_special));
+    // printf("FID (Appearance): 0x%.8hx\n", ntohl(func5->FID));
+    // printf("Unknown Special: 0x%.8hx\n", ntohl(func5->unknown_special));
     printf("Map Level: %d\n", ntohl(func5->map_level));
     printf("Items in Inventory: %d\n", ntohl(func5->items_in_inventory));
     printf("Crippled Body Parts: %d\n", ntohl(func5->crippled_body_parts));
@@ -109,6 +109,19 @@ void print_function_5(const function_5_t *func5) {
         print_item(&func5->inventory[i]);
     }
 
+}
+
+size_t get_function_5_size(const function_5_t *func5) {
+    if (func5 == NULL)
+        return 0;
+
+    size_t total_size = offsetof(function_5_t, inventory);
+    
+    for (uint32_t i = 0; i < ntohl(func5->items_in_inventory); ++i) {
+        total_size += get_item_size(&(func5->inventory[i]));
+    }
+
+    return total_size;
 }
 
 void free_function_5(function_5_t *func5) {

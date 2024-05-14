@@ -51,4 +51,4 @@ I would like to give a special mention to the detailed documentation provided by
 
 ## Disclaimer
 
-This project is in no way affiliated with the developers or publishers of Fallout. It is an independent project developed by someone made he made a bad character.
+This project is in no way affiliated with the developers or publishers of Fallout. It is an independent project developed by someone mad he made a bad character.

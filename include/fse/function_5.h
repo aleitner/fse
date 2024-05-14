@@ -185,4 +185,18 @@ const char* facing_to_string(uint32_t facing);
  */
 void free_function_5(function_5_t *func);
 
+/**
+ * Computes the total size in bytes of a Function 5 structure including the sizes
+ * of all items within its inventory. If the provided Function 5 structure pointer
+ * is NULL, this function returns zero.
+ * 
+ * @param func5
+ *     The function_5_t structure pointer from which to compute the total size.
+ * 
+ * @return
+ *     The total size of the Function 5 structure plus its inventory items' sizes,
+ *     in bytes. Returns 0 if the func5 parameter is NULL.
+ */
+size_t get_function_5_size(const function_5_t *func5);
+
 #endif
