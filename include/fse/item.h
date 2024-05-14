@@ -4,18 +4,56 @@
 #include <stdint.h>
 #include <stdio.h>
 
+/**
+ * An enumeration of the different item categories.
+ */
 typedef enum {
+    /**
+     * An unknown item category.
+     */
     ITEM_UNKNOWN,
+
+    /**
+     * A weapon item.
+     */
     ITEM_WEAPON,
+
+    /**
+     * An ammunition item.
+     */
     ITEM_AMMO,
+
+    /**
+     * An armor item.
+     */
     ITEM_ARMOR,
+
+    /**
+     * A drug item.
+     */
     ITEM_DRUG,
+
+    /**
+     * A miscellaneous item.
+     */
     ITEM_MISC
+
 } item_category_t;
 
+/**
+ * Struct containing information about a specific item type.
+ */
 typedef struct {
+    /**
+     * The unique identifier for the item.
+     */
     uint32_t id;
+    
+    /**
+     * A description of the item.
+     */
     const char *desc;
+
 } item_info_t;
 
 static const item_info_t WEAPONS[] = {
@@ -442,39 +480,197 @@ static const item_info_t MISC[] = {
 };
 
 #pragma pack(push, 1)
+/**
+ * Represents an item within the game, containing various fields of metadata
+ * and status information.
+ */
 typedef struct {
-    uint32_t quantity;         // The quantity of this item.
-    uint32_t unknown_field_1;  // Always 0.
-    uint32_t location;         // Location of item. Necessarily always -1 (in inventory)
-    uint32_t unknown_field_2;  // Always 0.
-    uint32_t unknown_field_3;  // Always 0.
-    uint32_t unknown_field_4;  // Unknown, 0 for most objects. Only non-zero for some items with special/quest uses. (E.g. poison tank, rubber boots, tool). 
-    uint32_t unknown_field_5;  // Unknown, 0 for most objects. Only non-zero for some items with special/quest uses. 
-    uint32_t unknown_field_6;  // Always 0.
-    uint32_t unknown_field_7;  // Unknown, 0 for most objects. For plant spikes, this is 1, and for sharpened poles, 2.
-    uint32_t on_ground_image;  // Item's on-ground image. 
-    uint32_t bitfield;         // A bitfield: 0x01000000 indicates the item is held in the right hand, 0x02000000 - in the left hand, and 0x04000000 - worn (as armor). Use of other bits is unknown. 
-    uint32_t map_level;        // 0, 1, or 2. Map level, which is irrelevant since it's in inventory. 
-    uint32_t object_id;        // Object ID
-    uint32_t unknown_field_9;  // Always -1. 
-    uint32_t unknown_field_10; // For Roentgen Rum and Gamma Gulp Beer, this is 0x00000001, for all others 0. 
-    uint32_t unknown_field_11; // For Roentgen Rum and Gamma Gulp Beer, this is 0x00010000, for all others 0. 
-    uint32_t unknown_field_12; // Always 0.
-    uint32_t script_id;        // Script ID; -1 for none
-    uint32_t unknown_field_13; // Always -1. 
-    uint32_t num_items;        // Usually 0; for containers it is the number of items in the container. The enclosed items are the ones immediately following it. 
-    uint32_t unknown_field_14; // Unknown. Non-zero only for containers.
-    uint32_t unknown_field_15; // Unknown. Non-zero only for containers.
-    uint32_t unknown_field_16; // Always 0.
-    uint32_t multiple_uses;    // Specific values depending on the item type
-    uint32_t ammo_type;        // The type of ammo that is used. Only exists if weapon is gun type
+    /**
+     * The quantity of this item.
+     */
+    uint32_t quantity;
+
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_1;
+
+    /**
+     * Location of item. Necessarily always -1 (in inventory).
+     */
+    uint32_t location;
+
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_2;
+
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_3;
+
+    /**
+     * Unknown, 0 for most objects. Only non-zero for some items with
+     * special/quest uses. (E.g. poison tank, rubber boots, tool).
+     */ 
+    uint32_t unknown_field_4;
+
+    /**
+     * Unknown, 0 for most objects. Only non-zero for some items with
+     * special/quest uses.
+     */
+    uint32_t unknown_field_5;
+
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_6;
+
+    /**
+     * Unknown, 0 for most objects. For plant spikes, this is 1,
+     * and for sharpened poles, 2.
+     */
+    uint32_t unknown_field_7;
+
+    /**
+     * Item's on-ground image.
+     */
+    uint32_t on_ground_image;
+
+    /**
+     * A bitfield: 0x01000000 indicates the item is held in the right hand,
+     * 0x02000000 - in the left hand, and 0x04000000 - worn (as armor).
+     * Use of other bits is unknown.
+     */
+    uint32_t bitfield;
+
+    /**
+     * 0, 1, or 2. Map level, which is irrelevant since it's in inventory.
+     */
+    uint32_t map_level;
+
+    /**
+     * Object ID.
+     */
+    uint32_t object_id;
+
+    /**
+     * Always -1.
+     */
+    uint32_t unknown_field_9;
+
+    /**
+     * For Roentgen Rum and Gamma Gulp Beer, this is 0x00000001, for all others 0.
+     */
+    uint32_t unknown_field_10;
+
+    /**
+     * For Roentgen Rum and Gamma Gulp Beer, this is 0x00010000, for all others 0.
+     */
+    uint32_t unknown_field_11;
+
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_12;
+
+    /**
+     * Script ID; -1 for none.
+     */
+    uint32_t script_id;
+
+    /**
+     * Always -1.
+     */
+    uint32_t unknown_field_13;
+
+    /**
+     * Usually 0; for containers it is the number of items in the container.
+     * The enclosed items are the ones immediately following it.
+     */ 
+    uint32_t num_items;
+
+    /**
+     * Unknown. Non-zero only for containers.
+     */
+    uint32_t unknown_field_14;
+
+    /**
+     * Unknown. Non-zero only for containers.
+     */
+    uint32_t unknown_field_15;
+    /**
+     * Always 0.
+     */
+    uint32_t unknown_field_16;
+
+    /**
+     * Specific values depending on the item type.
+     */
+    uint32_t multiple_uses;
+
+    /**
+     * The type of ammo that is used. Only exists if the item is a gun type.
+     */
+    uint32_t ammo_type;
 } item_t;
 #pragma pack(pop)
 
+/**
+ * Calculates the size of a given item, taking into account its category
+ * and whether it has additional fields (e.g., multiple uses or ammo type).
+ *
+ * @param item
+ *     The item for which to calculate the size.
+ * 
+ * @return
+ *     The size of the item in bytes.
+ */
 size_t get_item_size(const item_t* item);
+
+/**
+ * Reads an item from the given file at the specified offset and returns
+ * a pointer to a newly allocated item_t structure containing the item data.
+ * If reading fails, NULL is returned.
+ *
+ * @param file
+ *     The file from which to read the item.
+ *
+ * @param offset
+ *     The offset in the file where the item data is located.
+ * 
+ * @return
+ *     A pointer to a newly allocated item_t structure, or NULL if an
+ *     error occurs.
+ */
 item_t* read_item(FILE* file, uint32_t offset);
+
+/**
+ * Determines the category of an item based on its object ID.
+ *
+ * @param object_id
+ *     The object ID used to determine the item category.
+ * 
+ * @return
+ *     The item category of the item with the given object ID.
+ */
 item_category_t get_item_category(uint32_t object_id);
+
+/**
+ * Prints out the contents of an item structure in a human-readable format.
+ *
+ * @param item
+ *     The item whose details are to be printed.
+ */
 void print_item(const item_t *item);
+
+/**
+ * Frees the memory allocated for an item_t structure.
+ *
+ * @param item
+ *     The item to be freed.
+ */
 void free_item(item_t *item);
 
 #endif

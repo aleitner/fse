@@ -90,7 +90,6 @@
                 return NULL;
             }
         }
-
         
         else
             item->ammo_type = 0;
