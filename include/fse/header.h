@@ -166,6 +166,24 @@ typedef struct {
 header_t* load_header(FILE *file);
 
 /**
+ * Writes a Header structure to the specified file at the given offset.
+ * If an error occurs during writing, returns a nonzero error code.
+ *
+ * @param file
+ *     The file to which the Header data will be written.
+ *
+ * @param func6
+ *     A pointer to the header_t structure containing the data to write.
+ *
+ * @param offset
+ *     The offset within the file where Header data should be written.
+ *
+ * @return
+ *     Zero on successful write, or a nonzero error code on failure.
+ */
+int save_header(FILE *file, const header_t *header, uint32_t offset);
+
+/**
  * Prints out the contents of a save file header in a human-readable format.
  *
  * @param header

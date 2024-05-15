@@ -5,6 +5,7 @@
 #include "fse/function_1.h"
 #include "fse/function_5.h"
 #include "fse/function_6.h"
+#include "fse/endian_conversion.h"
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -22,7 +23,7 @@ int main(int argc, char *argv[]) {
     uint32_t function_6_offset = 0;
     int return_code = EXIT_SUCCESS;
 
-    saveFile = fopen(filename, "rb");
+    saveFile = fopen(filename, "r+b");
     if (!saveFile) {
         fprintf(stderr, "Error opening file '%s'.\n", filename);
         return_code = EXIT_FAILURE;
@@ -66,6 +67,12 @@ int main(int argc, char *argv[]) {
         return_code = EXIT_FAILURE;
         goto cleanup;
     }
+
+    int small_guns = (int)from_savefile_byte_order_32(function_6->skills[0]);
+    int energy_weapons = (int)from_savefile_byte_order_32(function_6->skills[2]);
+    function_6->skills[0] = to_savefile_byte_order_32((uint32_t)(small_guns - 49));
+    function_6->skills[2] = to_savefile_byte_order_32((uint32_t)(energy_weapons + 49));
+    // save_function_6(saveFile, function_6, function_6_offset);
 
     print_header(header);
     printf("\n");

@@ -140,6 +140,20 @@ typedef struct {
 uint32_t find_function_5_offset(FILE *file);
 
 /**
+ * Computes the total size in bytes of a Function 5 structure including the sizes
+ * of all items within its inventory. If the provided Function 5 structure pointer
+ * is NULL, this function returns zero.
+ * 
+ * @param func5
+ *     The function_5_t structure pointer from which to compute the total size.
+ * 
+ * @return
+ *     The total size of the Function 5 structure plus its inventory items' sizes,
+ *     in bytes. Returns 0 if the func5 parameter is NULL.
+ */
+size_t get_function_5_size(const function_5_t *func5);
+
+/**
  * Loads Function 5 data from the specified file at the given offset, returning
  * a pointer to a newly allocated function_5_t structure containing the data.
  * If an error occurs during reading or allocation, NULL is returned.
@@ -157,13 +171,22 @@ uint32_t find_function_5_offset(FILE *file);
 function_5_t* load_function_5(FILE *file, uint32_t offset);
 
 /**
- * Prints the information contained within a Function 5 structure in a
- * human-readable format.
+ * Writes a Function 5 structure to the specified file at the given offset.
+ * If an error occurs during writing, returns a nonzero error code.
+ *
+ * @param file
+ *     The file to which the Function 5 data will be written.
  *
  * @param func5
- *     The function_5_t structure whose contents are to be printed.
+ *     A pointer to the function_5_t structure containing the data to write.
+ *
+ * @param offset
+ *     The offset within the file where Function 5 data should be written.
+ *
+ * @return
+ *     Zero on successful write, or a nonzero error code on failure.
  */
-void print_function_5(const function_5_t *func5);
+int save_function_5(FILE *file, const function_5_t *func5, uint32_t offset);
 
 /**
  * Converts a facing value used within Function 5 to a human-readable string.
@@ -178,25 +201,20 @@ void print_function_5(const function_5_t *func5);
 const char* facing_to_string(uint32_t facing);
 
 /**
+ * Prints the information contained within a Function 5 structure in a
+ * human-readable format.
+ *
+ * @param func5
+ *     The function_5_t structure whose contents are to be printed.
+ */
+void print_function_5(const function_5_t *func5);
+
+/**
  * Frees the memory allocated for a function_5_t structure.
  *
  * @param func5
  *     The function_5_t structure to be freed.
  */
 void free_function_5(function_5_t *func);
-
-/**
- * Computes the total size in bytes of a Function 5 structure including the sizes
- * of all items within its inventory. If the provided Function 5 structure pointer
- * is NULL, this function returns zero.
- * 
- * @param func5
- *     The function_5_t structure pointer from which to compute the total size.
- * 
- * @return
- *     The total size of the Function 5 structure plus its inventory items' sizes,
- *     in bytes. Returns 0 if the func5 parameter is NULL.
- */
-size_t get_function_5_size(const function_5_t *func5);
 
 #endif

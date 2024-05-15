@@ -1,6 +1,6 @@
 #include "fse/function_5.h"
 
-#include <arpa/inet.h>
+#include "fse/endian_conversion.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +33,18 @@ uint32_t find_function_5_offset(FILE *file) {
     return 0;
 }
 
+size_t get_function_5_size(const function_5_t *func5) {
+    if (func5 == NULL)
+        return 0;
+
+    size_t total_size = offsetof(function_5_t, inventory);
+    
+    for (uint32_t i = 0; i < from_savefile_byte_order_32(func5->items_in_inventory); ++i) {
+        total_size += get_item_size(&(func5->inventory[i]));
+    }
+
+    return total_size;
+}
 
 function_5_t* load_function_5(FILE *file, uint32_t offset) {
     fseek(file, offset, SEEK_SET);
@@ -44,7 +56,7 @@ function_5_t* load_function_5(FILE *file, uint32_t offset) {
         return NULL;
     }
 
-    uint32_t items_in_inventory = ntohl(fixed_part.items_in_inventory);
+    uint32_t items_in_inventory = from_savefile_byte_order_32(fixed_part.items_in_inventory);
 
     size_t function_5_size = sizeof(function_5_t) + sizeof(item_t) * items_in_inventory;
     function_5_t *function_5 = (function_5_t *)malloc(function_5_size);
@@ -74,6 +86,28 @@ function_5_t* load_function_5(FILE *file, uint32_t offset) {
     return function_5;
 }
 
+int save_function_5(FILE *file, const function_5_t *func5, uint32_t offset) {
+    if (file == NULL || func5 == NULL) {
+        fprintf(stderr, "Invalid file or structure pointer.\n");
+        return 1;
+    }
+    
+    fseek(file, offset, SEEK_SET);
+    
+    size_t size_of_func5 = get_function_5_size(func5);
+
+    size_t num_written = fwrite(func5, size_of_func5, 1, file);
+    
+    if (num_written != 1) {
+        fprintf(stderr, "Failed to write function_5_t to file.\n");
+        return 1;
+    }
+
+    fflush(file);
+
+    return 0;
+}
+
 const char* facing_to_string(uint32_t facing) {
     switch (facing) {
         case 0: return "northeast";
@@ -92,36 +126,23 @@ void print_function_5(const function_5_t *func5) {
         return;
     }
 
-    printf("Signature: 0x%.8hx\n", ntohl(func5->signature));
-    printf("Coordinates: 0x%.8hx\n", ntohs(func5->coordinates));
-    printf("Facing: %s\n", facing_to_string(ntohl(func5->facing)));
-    // printf("FID (Appearance): 0x%.8hx\n", ntohl(func5->FID));
-    // printf("Unknown Special: 0x%.8hx\n", ntohl(func5->unknown_special));
-    printf("Map Level: %d\n", ntohl(func5->map_level));
-    printf("Items in Inventory: %d\n", ntohl(func5->items_in_inventory));
-    printf("Crippled Body Parts: %d\n", ntohl(func5->crippled_body_parts));
-    printf("Hitpoints: %d\n", ntohl(func5->hitpoints));
-    printf("Radiation Level: %d\n", ntohl(func5->radiation_level));
-    printf("Poison Level: %d\n", ntohl(func5->poison_level));
+    printf("Signature: 0x%.8hx\n", from_savefile_byte_order_32(func5->signature));
+    printf("Coordinates: 0x%.8hx\n", from_savefile_byte_order_16(func5->coordinates));
+    printf("Facing: %s\n", facing_to_string(from_savefile_byte_order_32(func5->facing)));
+    // printf("FID (Appearance): 0x%.8hx\n", from_savefile_byte_order_32(func5->FID));
+    // printf("Unknown Special: 0x%.8hx\n", from_savefile_byte_order_32(func5->unknown_special));
+    printf("Map Level: %d\n", from_savefile_byte_order_32(func5->map_level));
+    printf("Items in Inventory: %d\n", from_savefile_byte_order_32(func5->items_in_inventory));
+    printf("Crippled Body Parts: %d\n", from_savefile_byte_order_32(func5->crippled_body_parts));
+    printf("Hitpoints: %d\n", from_savefile_byte_order_32(func5->hitpoints));
+    printf("Radiation Level: %d\n", from_savefile_byte_order_32(func5->radiation_level));
+    printf("Poison Level: %d\n", from_savefile_byte_order_32(func5->poison_level));
 
-    for (uint32_t i = 0; i < ntohl(func5->items_in_inventory); ++i) {
+    for (uint32_t i = 0; i < from_savefile_byte_order_32(func5->items_in_inventory); ++i) {
         printf("\n");
         print_item(&func5->inventory[i]);
     }
 
-}
-
-size_t get_function_5_size(const function_5_t *func5) {
-    if (func5 == NULL)
-        return 0;
-
-    size_t total_size = offsetof(function_5_t, inventory);
-    
-    for (uint32_t i = 0; i < ntohl(func5->items_in_inventory); ++i) {
-        total_size += get_item_size(&(func5->inventory[i]));
-    }
-
-    return total_size;
 }
 
 void free_function_5(function_5_t *func5) {

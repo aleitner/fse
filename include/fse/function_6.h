@@ -104,12 +104,22 @@ typedef struct {
 function_6_t* load_function_6(FILE *file, uint32_t offset);
 
 /**
- * Frees the memory allocated for a function_6_t structure.
+ * Writes a Function 6 structure to the specified file at the given offset.
+ * If an error occurs during writing, returns a nonzero error code.
+ *
+ * @param file
+ *     The file to which the Function 6 data will be written.
  *
  * @param func6
- *     The function_6_t structure to be freed.
+ *     A pointer to the function_6_t structure containing the data to write.
+ *
+ * @param offset
+ *     The offset within the file where Function 6 data should be written.
+ *
+ * @return
+ *     Zero on successful write, or a nonzero error code on failure.
  */
-void free_function_6(function_6_t *func6);
+int save_function_6(FILE *file, const function_6_t *func6, uint32_t offset);
 
 /**
  * Prints the information contained within a Function 6 structure in a
@@ -119,5 +129,13 @@ void free_function_6(function_6_t *func6);
  *     The function_6_t structure whose contents are to be printed.
  */
 void print_function_6(const function_6_t *func6);
+
+/**
+ * Frees the memory allocated for a function_6_t structure.
+ *
+ * @param func6
+ *     The function_6_t structure to be freed.
+ */
+void free_function_6(function_6_t *func6);
 
 #endif

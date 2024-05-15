@@ -618,6 +618,17 @@ typedef struct {
 #pragma pack(pop)
 
 /**
+ * Determines the category of an item based on its object ID.
+ *
+ * @param object_id
+ *     The object ID used to determine the item category.
+ * 
+ * @return
+ *     The item category of the item with the given object ID.
+ */
+item_category_t get_item_category(uint32_t object_id);
+
+/**
  * Calculates the size of a given item, taking into account its category
  * and whether it has additional fields (e.g., multiple uses or ammo type).
  *
@@ -645,17 +656,6 @@ size_t get_item_size(const item_t* item);
  *     error occurs.
  */
 item_t* read_item(FILE* file, uint32_t offset);
-
-/**
- * Determines the category of an item based on its object ID.
- *
- * @param object_id
- *     The object ID used to determine the item category.
- * 
- * @return
- *     The item category of the item with the given object ID.
- */
-item_category_t get_item_category(uint32_t object_id);
 
 /**
  * Prints out the contents of an item structure in a human-readable format.
