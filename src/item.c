@@ -64,7 +64,7 @@ item_t* read_item(FILE* file, uint32_t offset) {
         return NULL;
     }
 
-    size_t fixed_part_size = offsetof(item_t, ammo_type);
+    size_t fixed_part_size = offsetof(item_t, multiple_uses);
     if (fread(item, fixed_part_size, 1, file) != 1) {
         fprintf(stderr, "Failed to read fixed part of the item at offset %u.\n", offset);
         free(item);

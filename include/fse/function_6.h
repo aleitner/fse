@@ -6,7 +6,6 @@
 
 #pragma pack(push, 1)
 typedef struct {
-    uint32_t unknown_field_0; // Not mentioned in documentation...
     uint32_t unknown_field_1;
     uint32_t tab_flags;
     uint32_t base_strength;

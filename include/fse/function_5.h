@@ -170,11 +170,14 @@ size_t get_function_5_size(const function_5_t *func5);
  * @param offset
  *     The offset within the file where Function 5 data begins.
  *
+ * @param camera
+ *     Output parameter for the camera position. May be NULL if not needed.
+ *
  * @return
  *     A pointer to the newly allocated function_5_t structure, or NULL if
  *     an error occurs.
  */
-function_5_t* load_function_5(FILE *file, uint32_t offset);
+function_5_t* load_function_5(FILE *file, uint32_t offset, uint32_t *camera);
 
 /**
  * Writes a Function 5 structure to the specified file at the given offset.
@@ -186,13 +189,16 @@ function_5_t* load_function_5(FILE *file, uint32_t offset);
  * @param func5
  *     A pointer to the function_5_t structure containing the data to write.
  *
+ * @param camera
+ *     The camera position to write after the inventory.
+ *
  * @param offset
  *     The offset within the file where Function 5 data should be written.
  *
  * @return
  *     Zero on successful write, or a nonzero error code on failure.
  */
-int save_function_5(FILE *file, const function_5_t *func5, uint32_t offset);
+int save_function_5(FILE *file, const function_5_t *func5, uint32_t camera, uint32_t offset);
 
 /**
  * Converts a facing value used within Function 5 to a human-readable string.

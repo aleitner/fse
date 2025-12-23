@@ -196,6 +196,7 @@ int main(int argc, char *argv[]) {
     function_6_t *function_6 = NULL;
     uint32_t function_5_offset = 0;
     uint32_t function_6_offset = 0;
+    uint32_t camera;
     int return_code = EXIT_SUCCESS;
 
     saveFile = fopen(filename, "r+b");
@@ -226,7 +227,7 @@ int main(int argc, char *argv[]) {
             goto cleanup;
         }
 
-        function_5 = load_function_5(saveFile, function_5_offset);
+        function_5 = load_function_5(saveFile, function_5_offset, &camera);
         if (!function_5) {
             fprintf(stderr, "Failed to load function 5 data.\n");
             return_code = EXIT_FAILURE;
@@ -310,7 +311,7 @@ int main(int argc, char *argv[]) {
             return_code = EXIT_FAILURE;
             goto cleanup;
         }
-        if (need_save_func5 && save_function_5(saveFile, function_5, function_5_offset) != 0) {
+        if (need_save_func5 && save_function_5(saveFile, function_5, camera, function_5_offset) != 0) {
             fprintf(stderr, "Failed to save function 5 data.\n");
             return_code = EXIT_FAILURE;
             goto cleanup;

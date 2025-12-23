@@ -43,10 +43,12 @@ size_t get_function_5_size(const function_5_t *func5) {
         total_size += get_item_size(&(func5->inventory[i]));
     }
 
+    total_size += 4;  // camera position (uint32) after inventory
+
     return total_size;
 }
 
-function_5_t* load_function_5(FILE *file, uint32_t offset) {
+function_5_t* load_function_5(FILE *file, uint32_t offset, uint32_t *camera) {
     fseek(file, offset, SEEK_SET);
 
     size_t fixed_part_size = offsetof(function_5_t, inventory);
@@ -83,10 +85,21 @@ function_5_t* load_function_5(FILE *file, uint32_t offset) {
         current_item_offset += get_item_size(&function_5->inventory[i]);
     }
 
+    // Read camera position after inventory
+    if (camera != NULL) {
+        fseek(file, current_item_offset, SEEK_SET);
+        if (fread(camera, sizeof(uint32_t), 1, file) != 1) {
+            fprintf(stderr, "Failed to read camera position.\n");
+            free(function_5);
+            return NULL;
+        }
+    }
+
     return function_5;
 }
 
-int save_function_5(FILE *file, const function_5_t *func5, uint32_t offset) {
+
+int save_function_5(FILE *file, const function_5_t *func5, uint32_t camera, uint32_t offset) {
     if (file == NULL || func5 == NULL) {
         fprintf(stderr, "Invalid file or structure pointer.\n");
         return 1;
@@ -94,12 +107,27 @@ int save_function_5(FILE *file, const function_5_t *func5, uint32_t offset) {
     
     fseek(file, offset, SEEK_SET);
     
-    size_t size_of_func5 = get_function_5_size(func5);
+    // Write fixed part (everything before inventory)
+    size_t fixed_part_size = offsetof(function_5_t, inventory);
+    if (fwrite(func5, fixed_part_size, 1, file) != 1) {
+        fprintf(stderr, "Failed to write function_5_t fixed part.\n");
+        return 1;
+    }
 
-    size_t num_written = fwrite(func5, size_of_func5, 1, file);
-    
-    if (num_written != 1) {
-        fprintf(stderr, "Failed to write function_5_t to file.\n");
+    // Write each inventory item with its actual file size
+    // (items have variable sizes but are stored in memory at sizeof(item_t) intervals)
+    uint32_t items_count = from_savefile_byte_order_32(func5->items_in_inventory);
+    for (uint32_t i = 0; i < items_count; ++i) {
+        size_t item_size = get_item_size(&func5->inventory[i]);
+        if (fwrite(&func5->inventory[i], item_size, 1, file) != 1) {
+            fprintf(stderr, "Failed to write inventory item %u.\n", i);
+            return 1;
+        }
+    }
+
+    // Write camera position after inventory
+    if (fwrite(&camera, sizeof(uint32_t), 1, file) != 1) {
+        fprintf(stderr, "Failed to write camera position.\n");
         return 1;
     }
 
