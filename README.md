@@ -9,8 +9,7 @@ FSE reads and modifies `SAVE.DAT` files, which contain player stats, inventory, 
 ## Installation
 
 ```sh
-# Requires GCC
-git clone <repo>
+git clone https://github.com/aleitner/fse
 cd fallout-save-editor
 make install
 ```
