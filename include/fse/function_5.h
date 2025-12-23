@@ -11,6 +11,12 @@
  */
 #define FUNCTION_5_SIGNATURE "\x00\x00\x46\x50"
 
+/**
+ * Print flags for print_function_5
+ */
+#define PRINT_PLAYER    0x01
+#define PRINT_INVENTORY 0x02
+
 #pragma pack(push, 1)
 
 /**
@@ -206,8 +212,14 @@ const char* facing_to_string(uint32_t facing);
  *
  * @param func5
  *     The function_5_t structure whose contents are to be printed.
+ *
+ * @param flags
+ *     Bitfield controlling what to print:
+ *     PRINT_PLAYER    - print player status (HP, rads, etc.)
+ *     PRINT_INVENTORY - print inventory items
+ *     Can be combined: PRINT_PLAYER | PRINT_INVENTORY
  */
-void print_function_5(const function_5_t *func5);
+void print_function_5(const function_5_t *func5, int flags);
 
 /**
  * Frees the memory allocated for a function_5_t structure.

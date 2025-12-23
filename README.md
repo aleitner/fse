@@ -1,54 +1,123 @@
 # Fallout Save Editor (FSE)
 
-This project provides a tool for reading and potentially editing the contents of savegame files for the classic game Fallout. This tool gives you the capability to view and modify various aspects of save files, including player stats, inventory, and game world state.
+A command-line tool for reading and editing savegame files for Fallout 1.
 
 ## Overview
 
-Fallout Savegame Editor (FSE) reads `.DAT` files which are archived data files containing everything about the player, party members, global variables, and state of the world map. Note that information about each town is stored in individual `.SAV` files instead of `.DAT` files.
+FSE reads and modifies `SAVE.DAT` files, which contain player stats, inventory, and world state. Town-specific data is stored in separate `.SAV` files (not currently supported).
 
 ## Installation
 
-To install FSE, follow these steps:
-
-1. Make sure you have the development files for GCC.
-2. Clone the repository or download the source code.
-3. `cd` into the root directory of the project.
-4. Run `make install` to compile and install the tool.
-
-The project contains a Makefile for easy building of the tool.
+```sh
+# Requires GCC
+git clone <repo>
+cd fallout-save-editor
+make install
+```
 
 ## Usage
 
-After successfully building and installing FSE, you can use it with the following command:
-
 ```sh
-fallout_save_editor <path to SAVE.DAT>
+# View save header (quick overview)
+fallout_save_editor SAVE.DAT
+
+# View player status (HP, rads, poison, location)
+fallout_save_editor SAVE.DAT player
+
+# View stats and skills
+fallout_save_editor SAVE.DAT stats
+
+# View inventory
+fallout_save_editor SAVE.DAT inventory
+
+# View everything
+fallout_save_editor SAVE.DAT all
+
+# Edit a stat
+fallout_save_editor SAVE.DAT set <stat> <value>
+
+# List editable stats
+fallout_save_editor --list
 ```
 
-Replace `<path to SAVE.DAT>` with the actual path to your Fallout savegame `.DAT` file.
+### Examples
+
+```sh
+# Clear radiation (useful after The Glow)
+fallout_save_editor ~/SLOT01/SAVE.DAT set radiation_level 0
+
+# Max out small guns
+fallout_save_editor ~/SLOT01/SAVE.DAT set small_guns 200
+
+# Rename your character
+fallout_save_editor ~/SLOT01/SAVE.DAT set player_name "Mad Max"
+
+# Check current HP and status
+fallout_save_editor ~/SLOT01/SAVE.DAT player
+```
+
+### Editable Stats
+
+**Save Info:** `player_name`, `savegame_name`, `current_map_filename`
+
+**Player Status:** `hitpoints`, `radiation_level`, `poison_level`, `crippled_body_parts`
+
+**Base Attributes:** `base_strength`, `base_perception`, `base_endurance`, `base_charisma`, `base_intelligence`, `base_agility`, `base_luck`
+
+**Derived Stats:** `base_hitpoints`, `base_action_points`, `base_armor_class`, `base_melee_damage`, `base_carry_weight`, `base_sequence`, `base_healing_rate`, `base_critical_chance`, `base_damage_threshold_normal`, `base_damage_resistance_normal`, `base_radiation_resistance`, `base_poison_resistance`
+
+**Bonus Stats:** `bonus_to_strength`, `bonus_to_perception`, `bonus_to_endurance`, `bonus_to_charisma`, `bonus_to_intelligence`, `bonus_to_agility`, `bonus_to_luck`, `bonus_to_maximum_hit_points`, `bonus_to_action_points`, `bonus_AC`, `bonus_melee_damage`, `bonus_carry_weight`, `bonus_critical_chance`
+
+**Skills:** `small_guns`, `big_guns`, `energy_weapons`, `unarmed`, `melee_weapons`, `throwing`, `first_aid`, `doctor`, `sneak`, `lockpick`, `steal`, `traps`, `science`, `repair`, `speech`, `barter`, `gambling`, `outdoorsman`
 
 ## Build Targets
 
-* `all`: Build the shared library and CLI tool.
-* `library-shared`: Build a shared library.
-* `cli`: Build the command-line interface.
-* `clean`: Remove all compiled binaries and object files.
-* `install`: Install all necessary components for using the tool.
-* `uninstall`: Remove all installed components of the tool.
+| Target | Description |
+|--------|-------------|
+| `all` | Build shared library and CLI |
+| `library-shared` | Build shared library only |
+| `cli` | Build CLI only |
+| `clean` | Remove build artifacts |
+| `install` | Install library, CLI, and headers |
+| `uninstall` | Remove installed files |
 
-## Contributing
+## Library Usage
 
-Contributions are welcome!
+```c
+#include <fse/header.h>
+#include <fse/function_5.h>
+#include <fse/function_6.h>
+#include <fse/endian_conversion.h>
+
+FILE *f = fopen("SAVE.DAT", "r+b");
+
+header_t *header = load_header(f);
+print_header(header);
+
+uint32_t offset = find_function_5_offset(f);
+function_5_t *player = load_function_5(f, offset);
+
+// Clear radiation
+player->radiation_level = to_savefile_byte_order_32(0);
+save_function_5(f, player, offset);
+
+free(player);
+free(header);
+fclose(f);
+```
+
+## File Format
+
+Save files use big-endian byte order. The file is divided into a header followed by 27 "functions" containing different data types. See the [format documentation](https://falloutmods.fandom.com/wiki/SAVE.DAT_File_Format) for details.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT License](LICENSE)
 
 ## Acknowledgments
 
-I would like to give a special mention to the detailed documentation provided by [falloutmods.fandom.com](https://falloutmods.fandom.com/wiki/SAVE.DAT_File_Format) for their extensive breakdown of the `SAVE.DAT` file format, which has been invaluable to the development of this tool.
-
+Format documentation from [Vault-Tec Labs](https://falloutmods.fandom.com/wiki/SAVE.DAT_File_Format).
 
 ## Disclaimer
 
-This project is in no way affiliated with the developers or publishers of Fallout. It is an independent project developed by someone mad he made a bad character.
+Not affiliated with the developers or publishers of Fallout. Built by someone who made a bad character and didn't want to start over.

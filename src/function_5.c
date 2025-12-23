@@ -120,29 +120,36 @@ const char* facing_to_string(uint32_t facing) {
     }
 }
 
-void print_function_5(const function_5_t *func5) {
+void print_function_5(const function_5_t *func5, int flags) {
     if (func5 == NULL) {
         printf("Function 5 data is NULL.\n");
         return;
     }
 
-    printf("Signature: 0x%.8hx\n", from_savefile_byte_order_32(func5->signature));
-    printf("Coordinates: 0x%.8hx\n", from_savefile_byte_order_16(func5->coordinates));
-    printf("Facing: %s\n", facing_to_string(from_savefile_byte_order_32(func5->facing)));
-    // printf("FID (Appearance): 0x%.8hx\n", from_savefile_byte_order_32(func5->FID));
-    // printf("Unknown Special: 0x%.8hx\n", from_savefile_byte_order_32(func5->unknown_special));
-    printf("Map Level: %d\n", from_savefile_byte_order_32(func5->map_level));
-    printf("Items in Inventory: %d\n", from_savefile_byte_order_32(func5->items_in_inventory));
-    printf("Crippled Body Parts: %d\n", from_savefile_byte_order_32(func5->crippled_body_parts));
-    printf("Hitpoints: %d\n", from_savefile_byte_order_32(func5->hitpoints));
-    printf("Radiation Level: %d\n", from_savefile_byte_order_32(func5->radiation_level));
-    printf("Poison Level: %d\n", from_savefile_byte_order_32(func5->poison_level));
-
-    for (uint32_t i = 0; i < from_savefile_byte_order_32(func5->items_in_inventory); ++i) {
-        printf("\n");
-        print_item(&func5->inventory[i]);
+    if (flags & PRINT_PLAYER) {
+        printf("Coordinates: 0x%.8x\n", from_savefile_byte_order_32(func5->coordinates));
+        printf("Facing: %s\n", facing_to_string(from_savefile_byte_order_32(func5->facing)));
+        printf("Map Level: %d\n", from_savefile_byte_order_32(func5->map_level));
+        printf("Items in Inventory: %d\n", from_savefile_byte_order_32(func5->items_in_inventory));
+        printf("Crippled Body Parts: %d\n", from_savefile_byte_order_32(func5->crippled_body_parts));
+        printf("Hitpoints: %d\n", from_savefile_byte_order_32(func5->hitpoints));
+        printf("Radiation Level: %d\n", from_savefile_byte_order_32(func5->radiation_level));
+        printf("Poison Level: %d\n", from_savefile_byte_order_32(func5->poison_level));
     }
 
+    if (flags & PRINT_INVENTORY) {
+        uint32_t item_count = from_savefile_byte_order_32(func5->items_in_inventory);
+
+        if (flags & PRINT_PLAYER)
+            printf("\n");
+
+        printf("Inventory (%d items):\n", item_count);
+
+        for (uint32_t i = 0; i < item_count; ++i) {
+            printf("\n");
+            print_item(&func5->inventory[i]);
+        }
+    }
 }
 
 void free_function_5(function_5_t *func5) {
