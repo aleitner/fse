@@ -94,11 +94,12 @@ header_t *header = load_header(f);
 print_header(header);
 
 uint32_t offset = find_function_5_offset(f);
-function_5_t *player = load_function_5(f, offset);
+uint32_t camera;
+function_5_t *player = load_function_5(f, offset, &camera);
 
 // Clear radiation
 player->radiation_level = to_savefile_byte_order_32(0);
-save_function_5(f, player, offset);
+save_function_5(f, player, camera, offset);
 
 free(player);
 free(header);
